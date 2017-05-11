@@ -6,15 +6,16 @@ cd DGHM_2017_test2/
 #Download read set from ebi sra - read 1 and read 2 necessary as they are paired end
 for n in 1 2; do wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/DRR076/DRR076717/DRR076717_${n}.fastq.gz; done
 #run read level qualtiy control
-for n in *fastq.gz; do fastqc $n; done
+#fix - download fastqc and call from dl file!
+#for n in *fastq.gz; do fastqc $n; done FIX
 #optional - SSU based library quality and composition tests
 #phyloFlash_latest -lib DRR076717 -read1 DRR076717_1.fastq.gz -read2 DRR076717_2.fastq.gz -readlength 150 -skip_spades -skip_emirge
 #adapter trimming from the read end
-bbduk.sh ref=/home/hgruber/bin/adapters.fa interleaved=t ktrim=r trimq=2 qtrim=rl minlength=50 mink=11 hdist=1 in=DRR076717_1.fastq.gz in2=DRR076717_2.fastq.gz out=DRR076717_all_fr_ktrimr_q2.fq.gz overwrite=t
+bbduk.sh ref=/opt/bbmap/resources/adapters.fa interleaved=t ktrim=r trimq=2 qtrim=rl minlength=50 mink=11 hdist=1 in=DRR076717_1.fastq.gz in2=DRR076717_2.fastq.gz out=DRR076717_all_fr_ktrimr_q2.fq.gz overwrite=t
 #run kmer count based ultra low coverage read removal
 bbnorm.sh in=DRR076717_all_fr_ktrimr_q2.fq.gz interleaved=t hist=DRR076717_hist.txt peaks=DRR076717_peaks.txt -Xmx10g lowbindepth=1 highbindepth=3 outhigh=DRR076717_kmerfilt3_fr.fq.gz passes=1
 #check the input files again using fastqc
-for n in *fq.gz; do fastqc $n; done
+#for n in *fq.gz; do fastqc $n; done # FIX
 #run spades assembly on kmer filtered data
 spades.py --12 DRR076717_kmerfilt3_fr.fq.gz -t 6 -m 20 -o DRR076717_kmerfilt3_SP310_default
 #get assembly statistics
